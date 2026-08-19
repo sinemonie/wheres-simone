@@ -343,16 +343,6 @@
       blurb:'Current home base. Still exploring — just with a permanent address now.' }
   ];
 
-  // Decorative waypoints for the "nomad" leg — a loose loop around the globe,
-  // not meant as literal cities, just a visual sense of wandering between LA and London.
-  var NOMAD_WAYPOINTS = [
-    { lat: 10, lon: -80 },
-    { lat: -8, lon: -35 },
-    { lat: 5,  lon: 25 },
-    { lat: 20, lon: 70 },
-    { lat: 15, lon: 105 }
-  ];
-
   var RADIUS = 100;
   var TEAL = 0x0fb5ae;
   var TEAL_DEEP = 0x0a8f89;
@@ -520,20 +510,19 @@
     {lat:STOPS[0].lat, lon:STOPS[0].lon},
     {lat:STOPS[1].lat, lon:STOPS[1].lon},
     {lat:STOPS[2].lat, lon:STOPS[2].lon},
-    {lat:STOPS[3].lat, lon:STOPS[3].lon}
+    {lat:STOPS[3].lat, lon:STOPS[3].lon},
+    {lat:STOPS[5].lat, lon:STOPS[5].lon}
   ];
-  NOMAD_WAYPOINTS.forEach(function(w){ pathLatLon.push(w); });
-  pathLatLon.push({lat:STOPS[5].lat, lon:STOPS[5].lon});
 
   var hopSegments = [
     [pathLatLon[0], pathLatLon[1]],
     [pathLatLon[1], pathLatLon[2]],
     [pathLatLon[2], pathLatLon[3]],
-    pathLatLon.slice(3)
+    [pathLatLon[3], pathLatLon[4]]
   ];
 
   var hopMeshes = hopSegments.map(function(seg, idx){
-    var pts = buildArcPoints(seg, seg.length>2 ? 10 : 40);
+    var pts = buildArcPoints(seg, 40);
     var color = idx === 3 ? TEAL_DEEP : TEAL;
     var mesh = arcMesh(pts, color, 0);
     globeGroup.add(mesh);
@@ -683,7 +672,9 @@
     if (stop.lat !== null){
       flyTo(stop.lat, stop.lon);
     } else {
-      flyTo(5, 30);
+      // No fixed location for this leg — center the view roughly between
+      // the two real stops it sits between (LA and London), not an invented place.
+      flyTo(42.8, -59.2);
     }
   }
 
