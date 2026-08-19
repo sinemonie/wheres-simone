@@ -443,12 +443,16 @@
   // Geometry helpers
   // ---------------------------------------------------------------
   function latLonToVector3(lat, lon, radius){
-    var latRad = lat * Math.PI/180;
-    var lonRad = lon * Math.PI/180;
-    var x = radius * Math.cos(latRad) * Math.sin(lonRad);
-    var y = radius * Math.sin(latRad);
-    var z = radius * Math.cos(latRad) * Math.cos(lonRad);
-    return new THREE.Vector3(x,y,z);
+    // Matches the UV wrapping of THREE.SphereGeometry's default parameterization
+    // against an equirectangular texture (row 0 = north pole, column center = lon 0).
+    // This must stay in sync with how buildGlobeTexture() projects the map, or
+    // markers drift away from the coastlines they're supposed to sit on.
+    var phi = (90 - lat) * (Math.PI / 180);
+    var theta = (lon + 180) * (Math.PI / 180);
+    var x = -radius * Math.sin(phi) * Math.cos(theta);
+    var y = radius * Math.cos(phi);
+    var z = radius * Math.sin(phi) * Math.sin(theta);
+    return new THREE.Vector3(x, y, z);
   }
 
   function markerAt(lat, lon, color){
@@ -571,9 +575,15 @@
   var lastInteraction = performance.now();
 
   function targetRotationFor(lat, lon){
-    var lonRad = lon * Math.PI/180;
-    var latRad = lat * Math.PI/180;
-    return { y: -lonRad, x: latRad*0.85 };
+    // Front-facing point (the one the camera sees dead-on) is now lon=-90
+    // under the corrected latLonToVector3 convention, so the yaw needed to
+    // bring an arbitrary lon to the front is offset by 90° from a naive
+    // -lonRad. Pitch stays a simple approximation — this is a "roughly
+    // face this city" heuristic, not a precise camera solve.
+    var theta = (lon + 180) * Math.PI / 180;
+    var rotY = -(theta - Math.PI / 2);
+    var latRad = lat * Math.PI / 180;
+    return { y: rotY, x: latRad * 0.85 };
   }
 
   function flyTo(lat, lon){
