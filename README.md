@@ -1,8 +1,8 @@
 # journey
 
-An interactive 3D globe of my route so far — Taipei → Sydney → Shanghai → Los Angeles → digital nomading → London.
+An interactive 3D globe of my route so far.
 
-**[View it live →](https://REPLACE-WITH-YOUR-USERNAME.github.io/journey/)**
+**[View it live →](https://sinemonie.github.io/wheres-simone/sinemonies_journey.html)**
 
 Drag to spin the globe, click a stop in the sidebar to fly there, or hit "Replay the route" to play through the whole thing in sequence.
 
